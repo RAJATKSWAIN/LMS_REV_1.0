@@ -1,4 +1,4 @@
-CREATE OR REPLACE PACKAGE BODY PKG_LMS_AUTOTRNS 
+CREATE OR REPLACE  PACKAGE BODY PKG_LMS_AUTOTRNS 
 
 AS
 
@@ -7,38 +7,38 @@ PROCEDURE PR_INSERT_AUTHOR(
     P_LNAME IN LMS_AUTHORS.LNAME%TYPE )
 AS
   -- *****************************************************************************************************************************
-  --                 |                                                                                                    	     *
-  -- PACKAGE HEADER  |  PKG_LMS_AUTOTRNS                                                                                   	     *
-  --                 |                                                                                                    	     *
-  -- PURPOSE         |  WORKFLOW HEADLINES FOR PR_INSERT_AUTHOR PROCEDURE             										     *
-  --                 |               																						     *
-  --                 |  STEP 1:PARAMETER CONVERSION AND VALIDATION             												     *
-  --                 |  	     CONVERT INPUT PARAMETERS TO UPPERCASE FOR CONSISTENCY.             						     *
-  --                 |  		 CHECK IF AN AUTHOR WITH THE SAME FIRST NAME AND LAST NAME ALREADY EXISTS.             		     *
-  --                 |               																						     *
-  --                 |  STEP 2:DETERMINE AUTHOR'S COUNTRY             														     *
-  --                 |  		 GENERATE THE AUTHOR'S COUNTRY BASED ON THE FIRST 3 CHARACTERS OF THE FIRST NAME USING REGEXP.   *
-  --                 |               																						     *
-  --                 |  STEP 3:GENERATE MAIL ID             																     *
-  --                 |  		 GENERATE A RANDOM MAIL DOMAIN BASED ON PROBABILITY.             							     *
-  --                 |  		 CREATE THE AUTHOR'S MAIL ID AS FNAME.LNAME + RANDOM MAIL DOMAIN.             				     *
-  --                 |               																						     *
-  --                 |  STEP 4:AUTHOR INSERTION             																     *
-  --                 |  		 GENERATE A UNIQUE AUTHOR ID USING THE EXISTING SEQUENCE.             						     *
-  --                 |  		 INSERT THE NEW AUTHOR'S DATA INTO THE LMS_AUTHORS TABLE.             						     *
-  --                 |  		 COMMIT THE TRANSACTION.             														     *
-  --                 |               																						     *
-  --                 |  STEP 5:DATA INSERTION VERIFICATION             															 *
-  --                 |  		 CHECK IF THE DATA WAS INSERTED SUCCESSFULLY INTO THE LMS_AUTHORS TABLE.             			 *
-  --                 |  		 HANDLE ANY EXCEPTIONS OR ERRORS DURING DATA INSERTION VERIFICATION.             				 *
+  --                 |                                                                                                    	 *
+  -- PACKAGE HEADER  |  PKG_LMS_AUTOTRNS                                                                                   	 *
+  --                 |                                                                                                    	 *
+  -- PURPOSE         |  WORKFLOW HEADLINES FOR PR_INSERT_AUTHOR PROCEDURE             				                 *
+  --                 |               							                                         *
+  --                 |  STEP 1:PARAMETER CONVERSION AND VALIDATION          					                 *
+  --                 |       CONVERT INPUT PARAMETERS TO UPPERCASE FOR CONSISTENCY.          	                 		 *
+  --                 |       CHECK IF AN AUTHOR WITH THE SAME FIRST NAME AND LAST NAME ALREADY EXISTS.               		 *
+  --                 |               								                                 *
+  --                 |  STEP 2:DETERMINE AUTHOR'S COUNTRY   							                 *
+  --                 |       GENERATE THE AUTHOR'S COUNTRY BASED ON THE FIRST 3 CHARACTERS OF THE FIRST NAME USING REGEXP.       *
+  --                 |               							                                         *
+  --                 |  STEP 3:GENERATE MAIL ID             				                                         *
+  --                 |        GENERATE A RANDOM MAIL DOMAIN BASED ON PROBABILITY.    		                                 *
+  --                 |        CREATE THE AUTHOR'S MAIL ID AS FNAME.LNAME + RANDOM MAIL DOMAIN.      		                 *
+  --                 |      							                                                 *
+  --                 |  STEP 4:AUTHOR INSERTION   							                         *
+  --                 |       GENERATE A UNIQUE AUTHOR ID USING THE EXISTING SEQUENCE.  			                         *
+  --                 |       INSERT THE NEW AUTHOR'S DATA INTO THE LMS_AUTHORS TABLE.     			                 *
+  --                 |       COMMIT THE TRANSACTION.      						                         *
+  --                 |               			                                                 			 *
+  --                 |  STEP 5:DATA INSERTION VERIFICATION              			                                 *
+  --                 |       CHECK IF THE DATA WAS INSERTED SUCCESSFULLY INTO THE LMS_AUTHORS TABLE.   			         *
+  --                 |       HANDLE ANY EXCEPTIONS OR ERRORS DURING DATA INSERTION VERIFICATION.               	                 *
   --                 |                                                                                                        	 *
   --                 |  STEP 6:DUPLICATE AUTHOR HANDLING                                                                      	 *
-  --				 |		 HANDLE THE CASE WHERE AN AUTHOR WITH THE SAME NAME ALREADY EXISTS.                                  *
-  --				 |  		 LOG THE ERROR USING PR_LOG_AUTHOR_ERROR PROCEDURE.                                              *
+  --		     |	     HANDLE THE CASE WHERE AN AUTHOR WITH THE SAME NAME ALREADY EXISTS.                                  *
+  --		     |       LOG THE ERROR USING PR_LOG_AUTHOR_ERROR PROCEDURE.                                                  *
   --                 |                                                                                                        	 *
   --                 |  STEP 7:EXCEPTION HANDLING                                                                             	 *
-  --                 |  		 HANDLE ANY OTHER EXCEPTIONS OR ERRORS THAT MAY OCCUR DURING THE PROCEDURE.                   	 *
-  --				 |		   		                                                			                                 *
+  --                 |       HANDLE ANY OTHER EXCEPTIONS OR ERRORS THAT MAY OCCUR DURING THE PROCEDURE.                          *
+  --		     |		         			                                           			 *
   --                 |   END OF PR_INSERT_AUTHOR PROCEDURE.                                                                      *
   --*****************************************************************************************************************************+
   -- ****************************************************************************************************************************+
@@ -53,7 +53,7 @@ AS
   -- 1.20       | 01-SEP-2021   |  RAJAT K. SWAIN   |     ENHANCEMENT: GENERATING EMAIL ID FROM NAME                             *
   -- ****************************************************************************************************************************+
 
- -- DECLARE VARIABLES
+  -- DECLARE VARIABLES
   VP_FNAME       VARCHAR2(50);
   VP_LNAME       VARCHAR2(50);
   V_AUTHOR_ID    NUMBER;
@@ -63,14 +63,14 @@ AS
   V_ATHR_CODE    CONSTANT CHAR(4)  := 'ATHR';
   V_ERROR_CODE   CONSTANT CHAR(14) := 'INSRT_ATHR_ERR'; -- INSERT AUTHOR ERRORS
   V_ERRORMSG     VARCHAR2(100)     := 'AUTHOR WITH THE SAME NAME ALREADY EXISTS.';
-  V_SUCCESS_FLAG NUMBER; --ADDED THE VERIABLE FOR CHECK DATA INSERTION SUCESSFUL 
-  V_MFNAME       VARCHAR2(50); --ADDED THIS VARIABLE FOR MAIL_ID +1.20V
-  V_MLNAME       VARCHAR2(50); --ADDED THIS VARIABLE FOR MAIL_ID +1.20V 
+  V_SUCCESS_FLAG NUMBER; --ADDED THE VERIABLE FOR CHECK DATA INSERTION SUCESSFUL +1.40V
+  V_MFNAME       VARCHAR2(50); --ADDED THIS VARIABLE FOR MAIL_ID +1.60V
+  V_MLNAME       VARCHAR2(50); --ADDED THIS VARIABLE FOR MAIL_ID +1.60V
 BEGIN
-  /* BEGIN 1.10*/
-  SELECT TRIM(P_FNAME), TRIM(P_LNAME) INTO VP_FNAME,VP_LNAME FROM DUAL;
-  /* END 1.10*/
   -- CONVERT INPUT PARAMETERS TO UPPERCASE FOR CONSISTENCY
+  /* BEGIN 1.20*/
+  SELECT TRIM(P_FNAME), TRIM(P_LNAME) INTO VP_FNAME,VP_LNAME FROM DUAL;
+  /* END 1.20*/
   VP_FNAME := UPPER(VP_FNAME);
   VP_LNAME := UPPER(VP_LNAME);
   
@@ -86,20 +86,20 @@ BEGIN
     V_AUTHOR_ID := NULL; -- SET V_AUTHOR_ID TO NULL TO INDICATE THAT NO RECORD WAS FOUND
   END;
   -- GENERATE A COUNTRY BASED ON THE FIRST 3 CHARACTERS OF THE FIRST NAME USING REGEXP
-	IF REGEXP_LIKE(SUBSTR(VP_FNAME, 1, 3), '^(ABHI|AMA|ANA|ASH|BAN|CHA|CHI|DEV|DHI|ELA|ESH|FRE|GAN|HAR|IND|ISH|JAY|JOH|KAR|KAV|LAK|MAN|MIS|NIK|NIS|OLI|POO|PRA|PRI|RAD|RAJ|RAK|RAM|SAN|SAR|SHR|SID|SRI|TAS|TRI|VAR|VIN)', 'I') THEN
+	IF REGEXP_LIKE(SUBSTR(VP_FNAME, 1, 3), '^(ABHI|AMA|ANA|ASH|BAN|CHA|CHI|DEV|DHI|ELA|ESH|FRE|GAN|HAR|IND|ISH|JAY|JOH|KAR|KAV|LAK|MAN|MIS|NIK|NIS|OLI|POO|PRA|PRI|RAD|RAJ|RAK|RAM|SAN|SAR|SHR|SID|SRI|TAS|TRI|VAR|VIN)', 'i') THEN
 	V_COUNTRY := 'INDIA';
-	ELSIF REGEXP_LIKE(SUBSTR(VP_FNAME, 1, 3), '^(ALB|BRI|CHR|DAV|EDD|ELI|ERI|FLO|GEO|GRE|HAN|JAC|JAN|JOH|JOS|MAR|MAT|NAT|NIC|OLI|OSC|PAT|PAU|PAU|RIC|ROB|SAR|STE|THO|TOB|TOM|WIL)', 'I') THEN
+	ELSIF REGEXP_LIKE(SUBSTR(VP_FNAME, 1, 3), '^(ALB|BRI|CHR|DAV|EDD|ELI|ERI|FLO|GEO|GRE|HAN|JAC|JAN|JOH|JOS|MAR|MAT|NAT|NIC|OLI|OSC|PAT|PAU|PAU|RIC|ROB|SAR|STE|THO|TOB|TOM|WIL)', 'i') THEN
 	V_COUNTRY := 'UNITED KINGDOM';
-	ELSIF REGEXP_LIKE(SUBSTR(VP_FNAME, 1, 3), '^(ADA|ANN|ASH|BAR|BOB|CAR|CAT|DAV|DOR|ELI|EVA|GRA|HAR|JEN|JIL|JOH|JOS|KAT|LAU|LEO|MAR|MEL|NAT|NEL|ROB|SAM|SAR|SOP|SUE|TAS|TOM|VIC)', 'I') THEN
+	ELSIF REGEXP_LIKE(SUBSTR(VP_FNAME, 1, 3), '^(ADA|ANN|ASH|BAR|BOB|CAR|CAT|DAV|DOR|ELI|EVA|GRA|HAR|JEN|JIL|JOH|JOS|KAT|LAU|LEO|MAR|MEL|NAT|NEL|ROB|SAM|SAR|SOP|SUE|TAS|TOM|VIC)', 'i') THEN
 	V_COUNTRY := 'USA';
 	ELSE
 	V_COUNTRY := 'NEED TO UPDATE'; -- PROVIDE A DEFAULT VALUE IF NONE OF THE CONDITIONS MATCH
 	END IF;
   
   -- GENERATE A RANDOM MAIL DOMAIN
-  /* BEGIN 1.20*/
+  /* BEGIN 1.30*/
   SELECT RTRIM(REPLACE(VP_FNAME, ' ', ''),'.'),TRIM(VP_LNAME) INTO V_MFNAME,V_MLNAME  FROM DUAL;
-  /* END 1.20*/  
+  /* END 1.30*/
   IF DBMS_RANDOM.VALUE(0, 1)    <= 0.3333 THEN
     V_MAIL_DOMAIN               := LOWER('@GMAIL.COM');
   ELSIF DBMS_RANDOM.VALUE(0, 1) <= 0.6666 THEN
@@ -204,12 +204,12 @@ AS
  --                 |                                                                                                      *
  --                 |  STEP 6: DATA INSERTION VERIFICATION                                                                 *
  --                 |          CHECK IF THE DATA WAS INSERTED SUCCESSFULLY INTO THE LMS_BOOKS TABLE.                       *
- --				    |	       HANDLE ANY EXCEPTIONS OR ERRORS DURING DATA INSERTION VERIFICATION.                         *
- --				    |                                                                                                      *
+ --		    |	       HANDLE ANY EXCEPTIONS OR ERRORS DURING DATA INSERTION VERIFICATION.                         *
+ --	            |                                                                                                      *
  --                 |  STEP 7: DUPLICATE BOOK HANDLING                                                                     *
  --                 |          HANDLE THE CASE WHERE A BOOK WITH THE SAME TITLE ALREADY EXISTS.                            *
  --                 |          LOG THE ERROR USING PR_LOG_BOOK_ERROR PROCEDURE.                                            *
- --				    |	                                                                                                   *
+ --	            |	                                                                                                   *
  --                 |  STEP 8: EXCEPTION HANDLING                                                                          *
  --                 |          HANDLE ANY OTHER EXCEPTIONS OR ERRORS THAT MAY OCCUR DURING THE PROCEDURE.                  *
  --                 |                                                                                                      *
@@ -385,7 +385,7 @@ AS
   --                 |                                                                                                    *
   --                 |                                                                                                    *
   --                 |                                                                                                    *
-  --				 |								   		                                                			  *
+  --		     |						                                  			  *
   -- *********************************************************************************************************************+
   -- *********************************************************************************************************************+
   -- PPROCEDURE NAME            | PR_INSERT_MEMBER                                                                        *
@@ -501,9 +501,9 @@ PROCEDURE PR_BOOK_TRANSACTION(
 AS
 
   -- *****************************************************************************************************************************
-  --                 |                                                                                                    	   *
-  -- PACKAGE HEADER  |  PKG_LMS_AUTOTRNS                                                                                   	   *
-  --                 |                                                                                                    	   *
+  --                 |                                                                                                    	 *
+  -- PACKAGE HEADER  |  PKG_LMS_AUTOTRNS                                                                                   	 *
+  --                 |                                                                                                    	 *
   -- PURPOSE         |  WORKFLOW FOR PR_BOOK_TRANSACTION PROCEDURE                                                               *
   --                 |                                                                                                           *
   --                 |  STEP 1: PARAMETER CONVERSION AND VALIDATION                                                              *
@@ -527,12 +527,12 @@ AS
   --                 |                                                                                                           *
   --                 |  STEP 6: DATA INSERTION VERIFICATION                                                                      *
   --                 |     CHECK IF THE DATA WAS INSERTED SUCCESSFULLY INTO LMS_BORROWEDBOOKS.                                   *
-  --				   |	   IF SUCCESSFUL, DISPLAY A SUCCESS MESSAGE AND UPDATE THE BOOK COUNT.                                 *
-  --				   |                                                                                                           *
+  --		     |	   IF SUCCESSFUL, DISPLAY A SUCCESS MESSAGE AND UPDATE THE BOOK COUNT.                                   *
+  --		     |                                                                                                           *
   --                 |  STEP 7: UPDATE BOOK COUNT                                                                                *
   --                 |     DECREMENT THE BOOK_NOS FOR THE BORROWED BOOK.                                                         *
   --                 |                                                                                                           *
-  --				   |	STEP 8: DISPLAY TRANSACTION SUMMARY                                                                    *
+  --		     |	STEP 8: DISPLAY TRANSACTION SUMMARY                                                                      *
   --                 |     DISPLAY A SUMMARY OF THE BOOK TRANSACTION, INCLUDING THE SUCCESS MESSAGE.                             *
   --                 |                                                                                                           *
   --                 |  STEP 9: CHECK UPDATED BOOK COUNT                                                                         *
@@ -544,7 +544,7 @@ AS
   --                 |                                                                                                           *
   --                 |  END OF PR_BOOK_TRANSACTION PROCEDURE                                                                     *
   --                 |                                                                                                           *
-  --				   |                                                                                                           *
+  --		     |                                                                                                           *
   --*****************************************************************************************************************************+
   -- ****************************************************************************************************************************+
   -- PPROCEDURE NAME            | PR_BOOK_TRANSACTION                                                                            *
@@ -747,37 +747,37 @@ AS
  --                 |                                                                                                    *
  -- PURPOSE         | WORKFLOW FOR PR_BOOK_TRANSACTION PROCEDURE                                                         *
  --                 | STEP 1: RETRIEVE BORROW INFORMATION                                                                *
- --	                |         RETRIEVE INFORMATION ABOUT THE BORROW RECORD USING THE PROVIDED P_BORROW_ID.               *
- --	                |         FETCH DATA SUCH AS V_BORROW_ID, V_BOOK_ID, V_MEMBER_ID, V_RETURN_DATE, V_FNAME,            *
- --	                |         V_LNAME, AND V_TITLE.                                                                      *
+ --	            |         RETRIEVE INFORMATION ABOUT THE BORROW RECORD USING THE PROVIDED P_BORROW_ID.               *
+ --	            |         FETCH DATA SUCH AS V_BORROW_ID, V_BOOK_ID, V_MEMBER_ID, V_RETURN_DATE, V_FNAME,            *
+ --	            |         V_LNAME, AND V_TITLE.                                                                      *
  --                 |                                                                                                    *
  --                 | STEP 2: CHECK IF BOOK IS ALREADY RETURNED                                                          *
- --	                |         CHECK IF THE BOOK ASSOCIATED WITH THE BORROW RECORD HAS ALREADY BEEN RETURNED.             *
- --	                |         IF THE BOOK IS RETURNED, DISPLAY A MESSAGE WITH DETAILS INCLUDING THE RETURN DATE          *
- --	                |         AND MEMBER'S NAME.                                                                         *
+ --	            |         CHECK IF THE BOOK ASSOCIATED WITH THE BORROW RECORD HAS ALREADY BEEN RETURNED.             *
+ --	            |         IF THE BOOK IS RETURNED, DISPLAY A MESSAGE WITH DETAILS INCLUDING THE RETURN DATE          *
+ --	            |         AND MEMBER'S NAME.                                                                         *
  --                 | STEP 3: UPDATE BORROWED BOOK RECORD                                                                *
- --	                |         IF THE BOOK IS NOT RETURNED, SET THE V_RETURN_DATE TO THE CURRENT DATE.                    *
- --	                |         UPDATE THE BORROWED BOOK RECORD WITH THE RETURN DATE.                                      *
- --	                |                                                                                                    *
- -- 				| STEP 4: UPDATE BOOK STATUS                                                                         *
- --					| 		  GET THE CURRENT BOOK STATUS (V_BOOK_STATUS) AND THE NUMBER OF AVAILABLE COPIES (V_BOOK_CNT)*
- --					| 		  FOR THE RETURNED BOOK.                                                                     *
- --					| 		  IF THE BOOK WAS MARKED AS 'BORROWED', UPDATE ITS STATUS TO 'AVAILABLE' AND                 *
- --					| 		  INCREMENT THE NUMBER OF AVAILABLE COPIES.                                                  *
- --				    |                                                                                                    *
- --					| STEP 5: COMMIT TRANSACTION                                                                         *
- --					| 		  COMMIT THE TRANSACTION TO SAVE THE CHANGES TO THE DATABASE.                                *
- --					| STEP 6: FINALIZE MESSAGE                                                                           *
- --					| 		  DISPLAY A SUCCESS MESSAGE INDICATING THAT THE BOOK HAS BEEN SUCCESSFULLY RETURNED,         *
- --					| 		  ALONG WITH BOOK AND MEMBER DETAILS.                                                        *
- --					| 		                                                                                             *
- --					| EXCEPTION HANDLING:                                                                                *
- --					| 		  HANDLE SCENARIOS WHERE THE BORROW RECORD IS NOT FOUND.                                     *
- --					| 		  HANDLE CASES OF INVALID INPUT OR INVALID BORROW ID.                                        *
- --					| 		  HANDLE ANY OTHER UNEXPECTED ERRORS AND DISPLAY ERROR MESSAGES.                             *
- --				    |                                                                                                    *
+ --	            |         IF THE BOOK IS NOT RETURNED, SET THE V_RETURN_DATE TO THE CURRENT DATE.                    *
+ --	            |         UPDATE THE BORROWED BOOK RECORD WITH THE RETURN DATE.                                      *
+ --	            |                                                                                                    *
+ -- 		    | STEP 4: UPDATE BOOK STATUS                                                                         *
+ --		    | 	      GET THE CURRENT BOOK STATUS (V_BOOK_STATUS) AND THE NUMBER OF AVAILABLE COPIES (V_BOOK_CNT)*
+ --		    | 	      FOR THE RETURNED BOOK.                                                                     *
+ --		    | 	     IF THE BOOK WAS MARKED AS 'BORROWED', UPDATE ITS STATUS TO 'AVAILABLE' AND                  *
+ --		    | 	     INCREMENT THE NUMBER OF AVAILABLE COPIES.                                                   *
+ --		    |                                                                                                    *
+ --		    | STEP 5: COMMIT TRANSACTION                                                                         *
+ --		    | 	      COMMIT THE TRANSACTION TO SAVE THE CHANGES TO THE DATABASE.                                *
+ --		    | STEP 6: FINALIZE MESSAGE                                                                           *
+ --		    | 	      DISPLAY A SUCCESS MESSAGE INDICATING THAT THE BOOK HAS BEEN SUCCESSFULLY RETURNED,         *
+ --		    | 	      ALONG WITH BOOK AND MEMBER DETAILS.                                                        *
+ --		    | 		                                                                                         *
+ --		    | EXCEPTION HANDLING:                                                                                *
+ --		    | 	      HANDLE SCENARIOS WHERE THE BORROW RECORD IS NOT FOUND.                                     *
+ --		    | 	      HANDLE CASES OF INVALID INPUT OR INVALID BORROW ID.                                        *
+ --		    | 	      HANDLE ANY OTHER UNEXPECTED ERRORS AND DISPLAY ERROR MESSAGES.                             *
+ --		    |                                                                                                    *
  --                 |                                                                                                    *
- --				    |               	                                                		                         *
+ --		    |    	                                                		                         *
  -- **********************************************************************************************************************
  -- *********************************************************************************************************************+
  -- PPROCEDURE NAME            | PR_RETURN_BOOK                                                                          *
@@ -824,7 +824,7 @@ AND LMB.BOOK_ID    =LBB.BOOK_ID
 AND LMB.BORROW_ID  = P_BORROW_ID;
   -- CHECK IF THE BOOK IS ALREADY RETURNED
   IF V_RETURN_DATE IS NOT NULL THEN
-    P_MESSAGE := 'THIS BOOK :-->'||V_TITLE||' HAS ALREADY BEEN RETURNED BY THE  '||V_FNAME||'  '||V_LNAME ||'  '|| TO_CHAR(V_RETURN_DATE, 'DD-MON-YYYY');
+    P_MESSAGE := 'THIS BOOK :-->'||V_TITLE||' HAS ALREADY BEEN RETURNED BY THE  '||'"'||V_FNAME||'  '||V_LNAME ||'"'||'  '|| TO_CHAR(V_RETURN_DATE, 'DD-MON-YYYY');
     DBMS_OUTPUT.PUT_LINE('***********************************************************************************************************');
     DBMS_OUTPUT.PUT_LINE(P_MESSAGE);
     DBMS_OUTPUT.PUT_LINE('***********************************************************************************************************');
@@ -858,7 +858,7 @@ AND LMB.BORROW_ID  = P_BORROW_ID;
     END IF;
     -- COMMIT THE TRANSACTION
     COMMIT;
-    P_MESSAGE := 'BOOK WITH-->'|| V_TITLE|| ' AND THIS MEMBER ' ||V_FNAME||'  '||V_LNAME || ' HAS BEEN SUCCESSFULLY RETURNED.';
+    P_MESSAGE := 'BOOK WITH-->'|| V_TITLE|| ' AND THIS MEMBER ' ||'"'||V_FNAME||'  '||V_LNAME ||'"'|| ' HAS BEEN SUCCESSFULLY RETURNED.';
     DBMS_OUTPUT.PUT_LINE('##################################################################################');
     DBMS_OUTPUT.PUT_LINE(P_MESSAGE);
     DBMS_OUTPUT.PUT_LINE('##################################################################################');
@@ -875,5 +875,6 @@ WHEN VALUE_ERROR THEN
 WHEN OTHERS THEN
   DBMS_OUTPUT.PUT_LINE('AN ERROR OCCURRED: ' || SQLERRM);
 END PR_RETURN_BOOK;
+
 
 END PKG_LMS_AUTOTRNS;
