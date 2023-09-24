@@ -98,7 +98,7 @@ UI/UX Designers
 Technical Writers
 System Administrators
 Project Timeline:
-The estimated timeline for LMS_REV_1.0 development is 12-18 months, with regular milestones and progress updates throughout the project.
+The estimated timeline for LMS_REV_1.0 development is 1-2 months, with regular milestones and progress updates throughout the project.
 
 ## Conclusion:
 LMS_REV_1.0 is designed to streamline library management operations, ensuring efficient member management, 
