@@ -1,4 +1,4 @@
-create or replace PACKAGE PKG_LMS_ERRORHANDELER AS
+CREATE OR REPLACE  PACKAGE PKG_LMS_ERRORHANDELER AS
   -- ************************************************************************************************************************
   --                  |                                                                                        		    *
   -- PACKAGE HEADER   | PKG_LMS_ERRORHANDELER                                                                  		    *
