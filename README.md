@@ -17,5 +17,5 @@ LMS_REV_1.0 is a comprehensive Library Management System designed to efficiently
 
 1. **Clone the Repository:**
    ```sh
-   git clone https://github.com/your-username/lms_rev_1.0.git
+   git clone https://github.com/RAJATKSWAIN/LMS_VER_1.0.git
    cd lms_rev_1.0
