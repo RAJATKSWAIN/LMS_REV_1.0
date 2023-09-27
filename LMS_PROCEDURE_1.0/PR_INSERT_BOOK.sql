@@ -5,7 +5,7 @@ CREATE OR REPLACE PROCEDURE PR_INSERT_BOOK(
     P_BOOK_GENER   IN LMS_BOOKS.BOOK_GENER%TYPE,
     P_PUBLISH_YEAR IN NUMBER
 	 )
-AS
+ AS
   -- ************************************************************************************************************
   --                  |                                                                                         *
   -- PACKAGE HEADER   |                                                                                         *
