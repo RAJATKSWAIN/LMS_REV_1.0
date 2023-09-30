@@ -22,13 +22,13 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Set up Java
-      uses: actions/setup-java@v2
-      with:
-        java-version: 21 # Specify the Java version you have installed
+      run: |
+        echo "Java 21 is already installed on the runner."
+        java -version
 
     - name: Set up Gradle
       run: |
-        # Use the locally configured GRADLE_HOME and PATH
+        echo "Using local Gradle installation:"
         echo "GRADLE_HOME: $GRADLE_HOME"
         echo "PATH: $PATH"
         gradle --version
@@ -36,4 +36,5 @@ jobs:
     - name: Build with Gradle
       run: |
         ./gradlew build
+
 
