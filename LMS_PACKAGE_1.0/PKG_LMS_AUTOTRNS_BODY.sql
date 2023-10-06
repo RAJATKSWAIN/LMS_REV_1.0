@@ -7,38 +7,38 @@ PROCEDURE PR_INSERT_AUTHOR(
     P_LNAME IN LMS_AUTHORS.LNAME%TYPE )
 AS
   -- *****************************************************************************************************************************
-  --                 |                                                                                                    	 *
-  -- PACKAGE HEADER  |  PKG_LMS_AUTOTRNS                                                                                   	 *
-  --                 |                                                                                                    	 *
-  -- PURPOSE         |  WORKFLOW HEADLINES FOR PR_INSERT_AUTHOR PROCEDURE             				                 *
-  --                 |               							                                         *
-  --                 |  STEP 1:PARAMETER CONVERSION AND VALIDATION          					                 *
-  --                 |       CONVERT INPUT PARAMETERS TO UPPERCASE FOR CONSISTENCY.          	                 		 *
-  --                 |       CHECK IF AN AUTHOR WITH THE SAME FIRST NAME AND LAST NAME ALREADY EXISTS.               		 *
-  --                 |               								                                 *
-  --                 |  STEP 2:DETERMINE AUTHOR'S COUNTRY   							                 *
+  --                 |                                                                                                    	     *
+  -- PACKAGE HEADER  |  PKG_LMS_AUTOTRNS                                                                                   	     *
+  --                 |                                                                                                    	     *
+  -- PURPOSE         |  WORKFLOW HEADLINES FOR PR_INSERT_AUTHOR PROCEDURE             				                                   *
+  --                 |               							                                                                               *
+  --                 |  STEP 1:PARAMETER CONVERSION AND VALIDATION          					                                           *
+  --                 |       CONVERT INPUT PARAMETERS TO UPPERCASE FOR CONSISTENCY.          	                 		               *
+  --                 |       CHECK IF AN AUTHOR WITH THE SAME FIRST NAME AND LAST NAME ALREADY EXISTS.               		         *
+  --                 |               								                                                                             *
+  --                 |  STEP 2:DETERMINE AUTHOR'S COUNTRY   							                                                       *
   --                 |       GENERATE THE AUTHOR'S COUNTRY BASED ON THE FIRST 3 CHARACTERS OF THE FIRST NAME USING REGEXP.       *
-  --                 |               							                                         *
-  --                 |  STEP 3:GENERATE MAIL ID             				                                         *
-  --                 |        GENERATE A RANDOM MAIL DOMAIN BASED ON PROBABILITY.    		                                 *
-  --                 |        CREATE THE AUTHOR'S MAIL ID AS FNAME.LNAME + RANDOM MAIL DOMAIN.      		                 *
-  --                 |      							                                                 *
-  --                 |  STEP 4:AUTHOR INSERTION   							                         *
-  --                 |       GENERATE A UNIQUE AUTHOR ID USING THE EXISTING SEQUENCE.  			                         *
-  --                 |       INSERT THE NEW AUTHOR'S DATA INTO THE LMS_AUTHORS TABLE.     			                 *
-  --                 |       COMMIT THE TRANSACTION.      						                         *
-  --                 |               			                                                 			 *
-  --                 |  STEP 5:DATA INSERTION VERIFICATION              			                                 *
-  --                 |       CHECK IF THE DATA WAS INSERTED SUCCESSFULLY INTO THE LMS_AUTHORS TABLE.   			         *
+  --                 |               							                                                                               *
+  --                 |  STEP 3:GENERATE MAIL ID             				                                                             *
+  --                 |        GENERATE A RANDOM MAIL DOMAIN BASED ON PROBABILITY.    		                                         *
+  --                 |        CREATE THE AUTHOR'S MAIL ID AS FNAME.LNAME + RANDOM MAIL DOMAIN.      		                         *
+  --                 |      							                                                                                       *
+  --                 |  STEP 4:AUTHOR INSERTION   							                                                                 *
+  --                 |       GENERATE A UNIQUE AUTHOR ID USING THE EXISTING SEQUENCE.  			                                     *
+  --                 |       INSERT THE NEW AUTHOR'S DATA INTO THE LMS_AUTHORS TABLE.     			                                 *
+  --                 |       COMMIT THE TRANSACTION.      						                                                           *
+  --                 |               			                                                 			                                 *
+  --                 |  STEP 5:DATA INSERTION VERIFICATION              			                                                   *
+  --                 |       CHECK IF THE DATA WAS INSERTED SUCCESSFULLY INTO THE LMS_AUTHORS TABLE.   			                     *
   --                 |       HANDLE ANY EXCEPTIONS OR ERRORS DURING DATA INSERTION VERIFICATION.               	                 *
   --                 |                                                                                                        	 *
   --                 |  STEP 6:DUPLICATE AUTHOR HANDLING                                                                      	 *
-  --		     |	     HANDLE THE CASE WHERE AN AUTHOR WITH THE SAME NAME ALREADY EXISTS.                                  *
-  --		     |       LOG THE ERROR USING PR_LOG_AUTHOR_ERROR PROCEDURE.                                                  *
+  --		             |	     HANDLE THE CASE WHERE AN AUTHOR WITH THE SAME NAME ALREADY EXISTS.                                  *
+  --		             |       LOG THE ERROR USING PR_LOG_AUTHOR_ERROR PROCEDURE.                                                  *
   --                 |                                                                                                        	 *
   --                 |  STEP 7:EXCEPTION HANDLING                                                                             	 *
   --                 |       HANDLE ANY OTHER EXCEPTIONS OR ERRORS THAT MAY OCCUR DURING THE PROCEDURE.                          *
-  --		     |		         			                                           			 *
+  --		             |		         			                                           			                                         *
   --                 |   END OF PR_INSERT_AUTHOR PROCEDURE.                                                                      *
   --*****************************************************************************************************************************+
   -- ****************************************************************************************************************************+
@@ -51,6 +51,7 @@ AS
   -- 1.00       | 31-JUL-2021   |  RAJAT K. SWAIN   |     FIRST VERSION                                                          *
   -- 1.10       | 11-AUG-2021   |  RAJAT K. SWAIN   |     ENHANCEMENT: TRIMMING INPUT PARAMETERS FOR CONSISTENCY                 *
   -- 1.20       | 01-SEP-2021   |  RAJAT K. SWAIN   |     ENHANCEMENT: GENERATING EMAIL ID FROM NAME                             *
+  -- 1.30       | 06-OCT-2022   |  RAJAT K. SWAIN   |     FNAME AND LNAME ARE MANDATORY PARAMETERS.                              *
   -- ****************************************************************************************************************************+
 
   -- DECLARE VARIABLES
@@ -67,6 +68,13 @@ AS
   V_MFNAME       VARCHAR2(50); --ADDED THIS VARIABLE FOR MAIL_ID +1.60V
   V_MLNAME       VARCHAR2(50); --ADDED THIS VARIABLE FOR MAIL_ID +1.60V
 BEGIN
+   /* BEGIN 1.30*/
+  -- CHECK IF BOTH P_FNAME AND P_LNAME ARE NOT NULL
+    IF P_FNAME IS NULL OR P_LNAME IS NULL THEN
+    RAISE_APPLICATION_ERROR(-20001, 'BOTH P_FNAME AND P_LNAME ARE MANDATORY PARAMETERS AND CANNOT BE NULL.');
+    RETURN ;
+    END IF;
+   /* END 1.30*/
   -- CONVERT INPUT PARAMETERS TO UPPERCASE FOR CONSISTENCY
   /* BEGIN 1.20*/
   SELECT TRIM(P_FNAME), TRIM(P_LNAME) INTO VP_FNAME,VP_LNAME FROM DUAL;
@@ -204,12 +212,12 @@ AS
  --                 |                                                                                                      *
  --                 |  STEP 6: DATA INSERTION VERIFICATION                                                                 *
  --                 |          CHECK IF THE DATA WAS INSERTED SUCCESSFULLY INTO THE LMS_BOOKS TABLE.                       *
- --		    |	       HANDLE ANY EXCEPTIONS OR ERRORS DURING DATA INSERTION VERIFICATION.                         *
- --	            |                                                                                                      *
+ --		              |	       HANDLE ANY EXCEPTIONS OR ERRORS DURING DATA INSERTION VERIFICATION.                           *
+ --	                |                                                                                                      *
  --                 |  STEP 7: DUPLICATE BOOK HANDLING                                                                     *
  --                 |          HANDLE THE CASE WHERE A BOOK WITH THE SAME TITLE ALREADY EXISTS.                            *
  --                 |          LOG THE ERROR USING PR_LOG_BOOK_ERROR PROCEDURE.                                            *
- --	            |	                                                                                                   *
+ --	                |	                                                                                                     *
  --                 |  STEP 8: EXCEPTION HANDLING                                                                          *
  --                 |          HANDLE ANY OTHER EXCEPTIONS OR ERRORS THAT MAY OCCUR DURING THE PROCEDURE.                  *
  --                 |                                                                                                      *
@@ -225,6 +233,7 @@ AS
  --------------+---------------+-------------------+-----------------------------------------------------------------------*
  -- 1.00       | 31-JUL-2021   |  RAJAT K. SWAIN   |     FIRST VERSION                                                     *
  -- 1.10       | 17-SEP-2023   |  RAJAT K. SWAIN   |     ENHANCEMENT: TRIMMING INPUT PARAMETERS FOR CONSISTENCY            *
+ -- 1.20       | 06-OCT-2022   |  RAJAT K. SWAIN   |     MANDATORY PARAMETERS CAN NOT NULL.                                *
  -- ************************************************************************************************************************
 
   -- DECLARE VARIABLES
@@ -238,7 +247,16 @@ AS
   VP_BOOK_GENER  VARCHAR2(100);
   VP_FNAME       VARCHAR2(50);  --1.10v
   VP_LNAME       VARCHAR2(50);  --1.10v
+  
 BEGIN
+    /* BEGIN 1.20*/
+ -- CHECK IF ANY OF THE REQUIRED PARAMETERS ARE NULL
+  IF P_FNAME IS NULL OR P_LNAME IS NULL OR P_TITLE IS NULL OR P_BOOK_GENER IS NULL OR P_PUBLISH_YEAR IS NULL THEN
+ -- HANDLE THE ERROR BY LOGGING IT
+    RAISE_APPLICATION_ERROR(-20001, 'EVERY PARAMETERS ARE MANDATORY');
+    RETURN;
+  END IF;
+    /* END 1.20*/
    /* BEGIN 1.10*/
   SELECT TRIM(P_TITLE), TRIM(P_BOOK_GENER) INTO VP_TITLE,VP_BOOK_GENER FROM DUAL;
    
@@ -385,7 +403,7 @@ AS
   --                 |                                                                                                    *
   --                 |                                                                                                    *
   --                 |                                                                                                    *
-  --		     |						                                  			  *
+  --		             |						                                  			                                                *
   -- *********************************************************************************************************************+
   -- *********************************************************************************************************************+
   -- PPROCEDURE NAME            | PR_INSERT_MEMBER                                                                        *
@@ -397,6 +415,7 @@ AS
   -- 1.00       | 31-JUL-2021   |  RAJAT K. SWAIN   |     FIRST VERSION                                                   *
   -- 1.10       | 17-SEP-2023   |  RAJAT K. SWAIN   |     ENHANCEMENT: TRIMMING INPUT PARAMETERS FOR CONSISTENCY          *
   -- 1.20       | 27-SEP-2023   |  RAJAT K. SWAIN   |     ENHANCEMENT: GENERATING EMAIL ID FROM NAME                      *
+  -- 1.30       | 06-OCT-2022   |  RAJAT K. SWAIN   |     FNAME AND LNAME ARE MANDATORY PARAMETERS.                       *
   -- *********************************************************************************************************************+
 
   -- DECLARE VARIABLES
@@ -412,6 +431,12 @@ AS
   V_MFNAME       VARCHAR2(50); --ADDED THIS VARIABLE FOR MAIL_ID +1.20V
   V_MLNAME       VARCHAR2(50); --ADDED THIS VARIABLE FOR MAIL_ID +1.20V
 BEGIN
+   /* BEGIN 1.30*/
+  -- CHECK IF BOTH P_FNAME AND P_LNAME ARE NOT NULL
+    IF P_FNAME IS NULL OR P_LNAME IS NULL THEN
+    RAISE_APPLICATION_ERROR(-20001, 'BOTH FNAME AND LNAME ARE MANDATORY PARAMETERS AND CANNOT BE NULL.');
+    END IF;
+   /* END 1.30*/
     /* BEGIN 1.10*/
   SELECT TRIM(P_FNAME), TRIM(P_LNAME) INTO VP_FNAME,VP_LNAME FROM DUAL;
     /* END 1.10*/
