@@ -7,38 +7,38 @@ PROCEDURE PR_INSERT_AUTHOR(
     P_LNAME IN LMS_AUTHORS.LNAME%TYPE )
 AS
   -- *****************************************************************************************************************************
-  --                 |                                                                                                    	     *
-  -- PACKAGE HEADER  |  PKG_LMS_AUTOTRNS                                                                                   	     *
-  --                 |                                                                                                    	     *
-  -- PURPOSE         |  WORKFLOW HEADLINES FOR PR_INSERT_AUTHOR PROCEDURE             				                                   *
-  --                 |               							                                                                               *
-  --                 |  STEP 1:PARAMETER CONVERSION AND VALIDATION          					                                           *
-  --                 |       CONVERT INPUT PARAMETERS TO UPPERCASE FOR CONSISTENCY.          	                 		               *
-  --                 |       CHECK IF AN AUTHOR WITH THE SAME FIRST NAME AND LAST NAME ALREADY EXISTS.               		         *
-  --                 |               								                                                                             *
-  --                 |  STEP 2:DETERMINE AUTHOR'S COUNTRY   							                                                       *
+  --                 |                                                                                                    	 *
+  -- PACKAGE HEADER  |  PKG_LMS_AUTOTRNS                                                                                   	 *
+  --                 |                                                                                                           *
+  -- PURPOSE         |  WORKFLOW HEADLINES FOR PR_INSERT_AUTHOR PROCEDURE             		                                 *
+  --                 |               							                                         *
+  --                 |  STEP 1:PARAMETER CONVERSION AND VALIDATION          					                 *
+  --                 |       CONVERT INPUT PARAMETERS TO UPPERCASE FOR CONSISTENCY.          	                                 *
+  --                 |       CHECK IF AN AUTHOR WITH THE SAME FIRST NAME AND LAST NAME ALREADY EXISTS.               	         *
+  --                 |               							                                         *
+  --                 |  STEP 2:DETERMINE AUTHOR'S COUNTRY   						                         *
   --                 |       GENERATE THE AUTHOR'S COUNTRY BASED ON THE FIRST 3 CHARACTERS OF THE FIRST NAME USING REGEXP.       *
-  --                 |               							                                                                               *
-  --                 |  STEP 3:GENERATE MAIL ID             				                                                             *
-  --                 |        GENERATE A RANDOM MAIL DOMAIN BASED ON PROBABILITY.    		                                         *
-  --                 |        CREATE THE AUTHOR'S MAIL ID AS FNAME.LNAME + RANDOM MAIL DOMAIN.      		                         *
-  --                 |      							                                                                                       *
-  --                 |  STEP 4:AUTHOR INSERTION   							                                                                 *
-  --                 |       GENERATE A UNIQUE AUTHOR ID USING THE EXISTING SEQUENCE.  			                                     *
-  --                 |       INSERT THE NEW AUTHOR'S DATA INTO THE LMS_AUTHORS TABLE.     			                                 *
-  --                 |       COMMIT THE TRANSACTION.      						                                                           *
-  --                 |               			                                                 			                                 *
-  --                 |  STEP 5:DATA INSERTION VERIFICATION              			                                                   *
-  --                 |       CHECK IF THE DATA WAS INSERTED SUCCESSFULLY INTO THE LMS_AUTHORS TABLE.   			                     *
+  --                 |               							                                         *
+  --                 |  STEP 3:GENERATE MAIL ID             				                                         *
+  --                 |        GENERATE A RANDOM MAIL DOMAIN BASED ON PROBABILITY.    		                                 *
+  --                 |        CREATE THE AUTHOR'S MAIL ID AS FNAME.LNAME + RANDOM MAIL DOMAIN.      		                 *
+  --                 |      							                                                 *
+  --                 |  STEP 4:AUTHOR INSERTION   							                         *
+  --                 |       GENERATE A UNIQUE AUTHOR ID USING THE EXISTING SEQUENCE.  			                         *
+  --                 |       INSERT THE NEW AUTHOR'S DATA INTO THE LMS_AUTHORS TABLE.     			                 *
+  --                 |       COMMIT THE TRANSACTION.      						                         *
+  --                 |               			                                                 			 *
+  --                 |  STEP 5:DATA INSERTION VERIFICATION              			                                 *
+  --                 |       CHECK IF THE DATA WAS INSERTED SUCCESSFULLY INTO THE LMS_AUTHORS TABLE.   			         *
   --                 |       HANDLE ANY EXCEPTIONS OR ERRORS DURING DATA INSERTION VERIFICATION.               	                 *
   --                 |                                                                                                        	 *
   --                 |  STEP 6:DUPLICATE AUTHOR HANDLING                                                                      	 *
-  --		             |	     HANDLE THE CASE WHERE AN AUTHOR WITH THE SAME NAME ALREADY EXISTS.                                  *
-  --		             |       LOG THE ERROR USING PR_LOG_AUTHOR_ERROR PROCEDURE.                                                  *
+  --		     |	     HANDLE THE CASE WHERE AN AUTHOR WITH THE SAME NAME ALREADY EXISTS.                                  *
+  --		     |       LOG THE ERROR USING PR_LOG_AUTHOR_ERROR PROCEDURE.                                                  *
   --                 |                                                                                                        	 *
   --                 |  STEP 7:EXCEPTION HANDLING                                                                             	 *
   --                 |       HANDLE ANY OTHER EXCEPTIONS OR ERRORS THAT MAY OCCUR DURING THE PROCEDURE.                          *
-  --		             |		         			                                           			                                         *
+  --		     |		         			                                                                 *
   --                 |   END OF PR_INSERT_AUTHOR PROCEDURE.                                                                      *
   --*****************************************************************************************************************************+
   -- ****************************************************************************************************************************+
@@ -212,12 +212,12 @@ AS
  --                 |                                                                                                      *
  --                 |  STEP 6: DATA INSERTION VERIFICATION                                                                 *
  --                 |          CHECK IF THE DATA WAS INSERTED SUCCESSFULLY INTO THE LMS_BOOKS TABLE.                       *
- --		              |	       HANDLE ANY EXCEPTIONS OR ERRORS DURING DATA INSERTION VERIFICATION.                           *
- --	                |                                                                                                      *
+ --		    |	       HANDLE ANY EXCEPTIONS OR ERRORS DURING DATA INSERTION VERIFICATION.                         *
+ --	            |                                                                                                      *
  --                 |  STEP 7: DUPLICATE BOOK HANDLING                                                                     *
  --                 |          HANDLE THE CASE WHERE A BOOK WITH THE SAME TITLE ALREADY EXISTS.                            *
  --                 |          LOG THE ERROR USING PR_LOG_BOOK_ERROR PROCEDURE.                                            *
- --	                |	                                                                                                     *
+ --	            |	                                                                                                   *
  --                 |  STEP 8: EXCEPTION HANDLING                                                                          *
  --                 |          HANDLE ANY OTHER EXCEPTIONS OR ERRORS THAT MAY OCCUR DURING THE PROCEDURE.                  *
  --                 |                                                                                                      *
@@ -903,3 +903,4 @@ END PR_RETURN_BOOK;
 
 
 END PKG_LMS_AUTOTRNS;
+/
